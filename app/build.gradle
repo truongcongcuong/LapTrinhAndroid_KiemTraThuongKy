@@ -31,6 +31,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 dependencies {
 
+    implementation 'com.android.volley:volley:1.2.0'
+
     implementation "com.google.firebase:firebase-auth:9.0.2"
 
     implementation platform('com.google.firebase:firebase-bom:28.0.1')
