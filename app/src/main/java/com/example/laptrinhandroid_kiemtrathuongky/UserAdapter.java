@@ -1,9 +1,11 @@
 package com.example.laptrinhandroid_kiemtrathuongky;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,12 +30,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.NameViewHolder
     List<User> users;
     LayoutInflater inflater;
     Context context;
+    Activity activity;
     String url = "https://60ad9ae180a61f00173313b8.mockapi.io/user";
 
-    public UserAdapter(List<User> users,Context context) {
+    public UserAdapter(List<User> users,Context context, Activity activity) {
         this.context = context;
         this.inflater = LayoutInflater.from(context);
         this.users = users;
+        this.activity = activity;
 
     }
 
@@ -49,6 +53,18 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.NameViewHolder
         User user = users.get(position);
         holder.txt_full_name.setText(user.getFirstName()+" "+ user.getLastName());
         holder.txt_age.setText("Age : " + user.getAge());
+        holder.itemView.setOnClickListener(v->{
+            TextView txt_id = activity.findViewById(R.id.txt_id);
+            EditText edt_first_name = activity.findViewById(R.id.edt_first_name);
+            EditText edt_last_name = activity.findViewById(R.id.edt_last_name);
+            EditText edt_age = activity.findViewById(R.id.edt_age);
+
+            txt_id.setText(user.getId());
+            edt_first_name.setText(user.getFirstName());
+            edt_last_name.setText(user.getLastName());
+            edt_age.setText(user.getAge()+"");
+
+        });
 
     }
 
@@ -67,6 +83,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.NameViewHolder
             txt_age = itemView.findViewById(R.id.txt_age);
 
         }
+    }
+
+    public void dataChange(){
+        notifyDataSetChanged();
     }
 
 

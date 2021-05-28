@@ -5,10 +5,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -35,8 +37,9 @@ public class MainActivity extends AppCompatActivity {
     EditText edt_first_name,edt_last_name,edt_age;
     Button btn_add,btn_update,btn_cancel;
     RecyclerView rcv_users;
-    UserAdapter adapter;
     List<User> users;
+    TextView txt_id;
+    UserAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         btn_add = findViewById(R.id.btn_add);
         btn_update = findViewById(R.id.btn_update);
         btn_cancel = findViewById(R.id.btn_cancel);
+        txt_id = findViewById(R.id.txt_id);
 
         edt_first_name.setHint("First Name");
         edt_last_name.setHint("Last Name");
@@ -62,7 +66,8 @@ public class MainActivity extends AppCompatActivity {
         btn_cancel.setText("Cancel");
 
 
-        getDataFromMockAPI(url);
+        getDataFromMockAPI(url,this);
+
 //        adapter = new UserAdapter(users,this);
 //        rcv_users.setAdapter(adapter);
 //        rcv_users.setLayoutManager(new GridLayoutManager(this ,1));
@@ -85,8 +90,53 @@ public class MainActivity extends AppCompatActivity {
             }
             
             postAPI(url);
+            getDataFromMockAPI(url,this);
+
+        });
+        
+        btn_update.setOnClickListener(v->{
+            if(!TextUtils.isEmpty(txt_id.getText().toString()))
+                putAPI(url);
+
+            else
+                Toast.makeText(MainActivity.this, "Chon doi tuong update ....", Toast.LENGTH_SHORT).show();
+            txt_id.setText("");
+            getDataFromMockAPI(url,this);
+
         });
 
+
+
+    }
+
+    private void putAPI(String url) {
+        StringRequest stringRequest = new StringRequest(Request.Method.PUT, url + "/" + txt_id.getText().toString(),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Toast.makeText(MainActivity.this, "Successfully", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(MainActivity.this, "Error by Put data!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        ){
+            @Nullable
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String,String> map = new HashMap<>();
+                map.put("firstName",edt_first_name.getText().toString());
+                map.put("lastName",edt_last_name.getText().toString());
+                map.put("age",edt_age.getText().toString());
+                return map;
+            }
+        };
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+        getDataFromMockAPI(url,this);
 
     }
 
@@ -111,17 +161,15 @@ public class MainActivity extends AppCompatActivity {
                 map.put("firstName",edt_first_name.getText().toString());
                 map.put("lastName",edt_last_name.getText().toString());
                 map.put("age",edt_age.getText().toString());
-
-
                 return  map;
             }
         };
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(stringRequest);
-        getDataFromMockAPI(url);
+
     }
 
-    private void getDataFromMockAPI(String url) {
+    private void getDataFromMockAPI(String url, Context context) {
         users = new ArrayList<>();
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(url,
                 new Response.Listener<JSONArray>(){
@@ -138,9 +186,10 @@ public class MainActivity extends AppCompatActivity {
                                 user.setAge(jsonObject.getInt("age"));
 
                                 users.add(user);
-                                adapter = new UserAdapter(users,MainActivity.this);
+                                adapter = new UserAdapter(users,context, MainActivity.this);
                                 rcv_users.setAdapter(adapter);
                                 rcv_users.setLayoutManager(new GridLayoutManager(MainActivity.this ,1));
+
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -156,6 +205,5 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(jsonArrayRequest);
     }
 }
