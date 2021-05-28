@@ -5,19 +5,36 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.NameViewHolder> {
     List<User> users;
     LayoutInflater inflater;
+    Context context;
+    String url = "https://60ad9ae180a61f00173313b8.mockapi.io/user";
 
-    public UserAdapter(List<User> users, Context context) {
-        this.users = users;
+    public UserAdapter(List<User> users,Context context) {
+        this.context = context;
         this.inflater = LayoutInflater.from(context);
+        this.users = users;
+
     }
 
     @NonNull
@@ -51,4 +68,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.NameViewHolder
 
         }
     }
+
+
 }
